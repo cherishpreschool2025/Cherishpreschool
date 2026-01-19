@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-blue-50 via-pink-50 to-yellow-50 min-h-screen;
+  }
+}
+
+@layer components {
+  .card-hover {
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-cherish-pink via-cherish-purple to-cherish-blue bg-clip-text text-transparent;
+  }
+}
+
+@layer utilities {
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) rotate(-6deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(-4deg);
+    }
+  }
+
+  @keyframes float-delayed {
+    0%, 100% {
+      transform: translateY(0px) rotate(3deg);
+    }
+    50% {
+      transform: translateY(-12px) rotate(5deg);
+    }
+  }
+
+  @keyframes bounce-slow {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes bounce-slow-delayed {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes drift {
+    0% {
+      transform: translateX(0px);
+    }
+    100% {
+      transform: translateX(20px);
+    }
+  }
+
+  @keyframes drift-delayed {
+    0% {
+      transform: translateX(0px);
+    }
+    100% {
+      transform: translateX(-15px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float-delayed 3.5s ease-in-out infinite;
+    animation-delay: 0.5s;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce-slow 2s ease-in-out infinite;
+  }
+
+  .animate-bounce-slow-delayed {
+    animation: bounce-slow-delayed 2.5s ease-in-out infinite;
+    animation-delay: 0.3s;
+  }
+
+  .animate-drift {
+    animation: drift 8s ease-in-out infinite alternate;
+  }
+
+  .animate-drift-delayed {
+    animation: drift-delayed 10s ease-in-out infinite alternate;
+  }
+
+  @keyframes wave {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(-25px);
+    }
+  }
+
+  @keyframes wave-delayed {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(25px);
+    }
+  }
+
+  .animate-wave {
+    animation: wave 4s ease-in-out infinite;
+  }
+
+  .animate-wave-delayed {
+    animation: wave-delayed 5s ease-in-out infinite;
+    animation-delay: 0.5s;
+  }
+
+  @keyframes revolve {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-revolve {
+    animation: revolve 20s linear infinite;
+  }
+}
+

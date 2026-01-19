@@ -1,0 +1,63 @@
+import React, { useState } from 'react'
+import ActivityDetailModal from './ActivityDetailModal'
+
+function ActivityCard({ activity }) {
+  const [showModal, setShowModal] = useState(false)
+  
+  // Check for images - support both old format (imageFile) and new format (images array)
+  const hasImage = activity.images && activity.images.length > 0
+    ? activity.images[0]
+    : (activity.imageFile && activity.imageFile.startsWith('data:image') ? activity.imageFile : null)
+
+  return (
+    <>
+      <div className={`bg-gradient-to-br ${activity.color} rounded-2xl p-6 shadow-xl hover:shadow-2xl text-white relative overflow-hidden transition-all duration-300 transform hover:scale-105`}>
+        {/* Decorative circles */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
+        
+        <div className="relative z-10">
+          {/* Show uploaded image if available, otherwise show emoji */}
+          {hasImage ? (
+            <div className="mb-4 rounded-xl overflow-hidden shadow-lg cursor-pointer" onClick={() => setShowModal(true)}>
+              <img 
+                src={hasImage} 
+                alt={activity.title}
+                className="w-full h-48 object-cover hover:scale-110 transition-transform duration-300"
+              />
+              {activity.images && activity.images.length > 1 && (
+                <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-semibold">
+                  +{activity.images.length} photos
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-6xl mb-4 transform hover:scale-110 transition-transform duration-300 cursor-pointer text-center" onClick={() => setShowModal(true)}>
+              {activity.image}
+            </div>
+          )}
+          <h3 className="text-xl md:text-2xl font-bold mb-2 leading-tight">{activity.title}</h3>
+          <p className="text-white/90 mb-4 text-base line-clamp-2 leading-relaxed">{activity.description}</p>
+          <div className="flex items-center justify-end">
+            <button 
+              onClick={() => setShowModal(true)}
+              className="bg-white text-gray-800 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-100 transition-colors duration-300 transform hover:scale-105"
+            >
+              View More →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {showModal && (
+        <ActivityDetailModal 
+          activity={activity} 
+          onClose={() => setShowModal(false)} 
+        />
+      )}
+    </>
+  )
+}
+
+export default ActivityCard
+
