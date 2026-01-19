@@ -71,7 +71,7 @@ function AboutSection() {
                         transform: 'translate(-50%, -50%)'
                       }}
                     >
-                      <div className={`bg-gradient-to-br ${feature.color} rounded-full w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 flex items-center justify-center p-2 sm:p-3 md:p-4 transform hover:scale-110 transition-all duration-300`}>
+                      <div className={`bg-gradient-to-br ${feature.color} rounded-full w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 flex items-center justify-center p-2 sm:p-3 md:p-4 hover:scale-110 transition-all duration-300 animate-counter-revolve`}>
                         <p className="text-white text-xs sm:text-sm md:text-base font-bold text-center leading-tight">
                           {feature.text}
                         </p>

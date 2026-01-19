@@ -135,8 +135,21 @@
     }
   }
 
+  @keyframes counter-revolve {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(-360deg);
+    }
+  }
+
   .animate-revolve {
     animation: revolve 20s linear infinite;
+  }
+
+  .animate-counter-revolve {
+    animation: counter-revolve 20s linear infinite;
   }
 }
 

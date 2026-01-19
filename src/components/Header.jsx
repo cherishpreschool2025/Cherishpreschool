@@ -35,7 +35,7 @@ function Header({ isAdmin, onAdminClick }) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 text-white shadow-lg" style={{ background: 'linear-gradient(to right, #ff6b9d 0%, #a78bfa 20%, #4a90e2 40%, #6bcb77 60%, #ffd93d 80%, #ff8c42 100%)' }}>
+      <header className="fixed top-0 left-0 right-0 z-50 text-white shadow-lg" style={{ background: 'linear-gradient(to right,rgb(121, 69, 163) 0%,rgb(127, 97, 197) 50%,rgb(71, 127, 192) 100%)' }}>
         <div className="container mx-auto px-3 md:px-4 py-2 md:py-2.5">
           <div className="flex items-center justify-between">
             {/* Logo and School Name */}

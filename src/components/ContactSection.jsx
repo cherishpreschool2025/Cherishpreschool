@@ -94,13 +94,14 @@ function ContactSection() {
             <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 pb-0 border-t-2 border-gray-100">
               <style dangerouslySetInnerHTML={{__html: `
                 @keyframes moveCar {
-                  0% { transform: translateX(0); }
-                  50% { transform: translateX(calc(100% - 2.5rem)); }
-                  100% { transform: translateX(0); }
+                  0% { transform: translateX(0) translateY(-2px); }
+                  50% { transform: translateX(calc(100% - 2.5rem)) translateY(-2px); }
+                  100% { transform: translateX(0) translateY(-2px); }
                 }
                 .moving-car {
                   animation: moveCar 3s ease-in-out infinite;
                   display: inline-block;
+                  vertical-align: middle;
                 }
               `}} />
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-end">
@@ -109,10 +110,14 @@ function ContactSection() {
                   href={directionsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="relative inline-flex items-center justify-center gap-3 bg-transparent text-black px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-sm sm:text-base flex-1 sm:flex-none overflow-hidden md:hidden"
+                  className="relative inline-flex items-center justify-center gap-1.5 text-white px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-bold hover:shadow-2xl transition-all duration-300 transform hover:scale-105 text-sm sm:text-base flex-1 sm:flex-none overflow-hidden md:hidden"
+                  style={{
+                    boxShadow: '0 4px 14px 0 rgba(52, 211, 153, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                    background: 'linear-gradient(135deg, #34d399 0%, #10b981 50%,rgb(47, 184, 134) 100%)'
+                  }}
                 >
-                  <span className="moving-car text-xl sm:text-2xl">🚗</span>
-                  <span className="font-extrabold whitespace-nowrap">Get Directions</span>
+                  <span className="moving-car text-xl sm:text-2xl drop-shadow-lg flex-shrink-0">🚗</span>
+                  <span className="font-extrabold whitespace-nowrap drop-shadow-md">Get Directions</span>
                 </a>
 
                 {/* Social Media */}
