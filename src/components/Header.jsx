@@ -64,6 +64,12 @@ function Header({ isAdmin, onAdminClick }) {
                 About
               </button>
               <button
+                onClick={() => scrollToSection('programs')}
+                className="px-4 py-2 text-sm md:text-base font-semibold bg-white/20 hover:bg-white/30 rounded-full transition-all duration-300"
+              >
+                Programs
+              </button>
+              <button
                 onClick={() => scrollToSection('activities')}
                 className="px-4 py-2 text-sm md:text-base font-semibold bg-white/20 hover:bg-white/30 rounded-full transition-all duration-300"
               >
@@ -126,6 +132,12 @@ function Header({ isAdmin, onAdminClick }) {
             className="w-full text-left py-3 text-gray-800 text-base font-medium hover:text-cherish-pink transition-colors duration-200 border-b border-gray-100"
           >
             About
+          </button>
+          <button
+            onClick={() => scrollToSection('programs')}
+            className="w-full text-left py-3 text-gray-800 text-base font-medium hover:text-cherish-pink transition-colors duration-200 border-b border-gray-100"
+          >
+            Programs
           </button>
           <button
             onClick={() => scrollToSection('activities')}

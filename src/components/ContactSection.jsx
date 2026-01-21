@@ -4,7 +4,7 @@ import React from 'react'
 const contactInfo = {
   phone: '9844162528',
   email: 'cherishpreschool2025@gmail.com',
-  address: "Cherish School, 1st Parallel Road, Stage 1, Vinobanagar, Shivamogga, Karnataka. 9 m from Param Embroidery, Pin-577204 (India)",
+  address: "'Zeena Villa', 2nd Cross, Near Vikasa School, Police Chowki, JPN Park, Vinobanagar, Shimoga.",
   instagram: 'https://www.instagram.com/cherish_pre_school?igsh=dW84OHQzbnk4M2dz',
   googleMapsUrl: 'https://maps.app.goo.gl/4Pwveu6a1HZXYGX59'
 }

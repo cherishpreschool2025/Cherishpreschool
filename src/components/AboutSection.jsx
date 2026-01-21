@@ -39,14 +39,14 @@ function AboutSection() {
         <div className="grid grid-cols-1 md:grid-cols-[7fr_3fr] gap-8 md:gap-12 items-center">
           {/* Left Side - Text Content (70%) */}
           <div className="flex flex-col justify-center">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:text-left text-center">
-              Welcome to Cherish Pre School in Shimogga
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 md:text-left text-center">
+              Welcome to Cherish Pre School
             </h2>
             <p className="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed md:text-left text-center mb-4">
               Welcome to Cherish Pre School in Shimogga, providing a safe and fun learning environment for young children. Our curriculum is designed to foster creativity, curiosity, and confidence in every child. Through hands-on activities, interactive learning, and personalized attention, we ensure that each child reaches their full potential. Our experienced educators create a warm and welcoming atmosphere where children feel safe to explore, learn, and grow.
             </p>
             <p className="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed md:text-left text-center">
-              At Cherish Pre School, we understand that early childhood education is the foundation for lifelong learning. As one of the best preschools in Shivamogga, we focus on developing not just academic skills, but also social, emotional, and physical development. Join us in nurturing the next generation of bright, confident, and compassionate individuals. Cherish Pre School - your trusted play school in Shimogga.
+              At Cherish Pre School, we understand that early childhood education is the foundation for lifelong learning. As one of the best preschools in Shivamogga, we focus on developing not just academic skills, but also social, emotional, and physical development. Join us in nurturing the next generation of bright, confident, and compassionate individuals. 
             </p>
           </div>
 
