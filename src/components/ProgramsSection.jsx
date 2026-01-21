@@ -172,7 +172,7 @@ function ProgramsSection() {
                         className="relative w-full h-full"
                       >
                         {/* Book Page */}
-                        <div className="relative rounded-xl md:rounded-2xl p-2.5 md:p-4 shadow-2xl border-4 h-full overflow-hidden" style={{
+                        <div className="relative rounded-xl md:rounded-2xl p-4 shadow-2xl border-4 h-full overflow-hidden" style={{
                           boxShadow: '0 25px 70px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(0,0,0,0.1)',
                           background: 'linear-gradient(to right, #f0f9ff, #ffffff, #f0f9ff)',
                           borderColor: program.gradient.includes('pink') 
@@ -187,18 +187,19 @@ function ProgramsSection() {
                           <div className="absolute left-4 right-4 top-0 bottom-0 opacity-8 notebook-lines"></div>
                           
                           {/* Content */}
-                          <div className="relative z-10 h-full flex flex-col pt-2 md:pt-3">
+                          <div className="relative z-10 h-full flex flex-col pt-3">
                             {/* Description - Playful Style */}
-                            <p className="text-slate-800 text-sm md:text-sm mb-2 md:mb-4 leading-tight handwritten" style={{
-                              lineHeight: '1.3'
+                            <p className="text-sm text-slate-800 mb-4 leading-tight handwritten" style={{
+                              lineHeight: '1.3',
+                              fontFamily: "'cursive', 'Comic Sans MS', 'Marker Felt', 'Bradley Hand', sans-serif"
                             }}>
                               {program.description}
                             </p>
                             
-                            <div className="space-y-1 md:space-y-2 flex-1 min-h-0">
+                            <div className="space-y-2 flex-1 min-h-0">
                               {/* Section Header - Playful Underlined */}
-                              <div className="relative mb-1 md:mb-2">
-                                <p className="text-sm md:text-sm font-bold uppercase tracking-wider inline-block handwritten" style={{
+                              <div className="relative mb-2">
+                                <p className="text-sm font-bold uppercase tracking-wider inline-block handwritten" style={{
                                   borderBottom: program.gradient.includes('pink') 
                                     ? '2px double #f472b6'
                                     : program.gradient.includes('blue')
@@ -213,7 +214,8 @@ function ProgramsSection() {
                                     ? '#1e40af'
                                     : program.gradient.includes('green')
                                     ? '#047857'
-                                    : '#7e22ce'
+                                    : '#7e22ce',
+                                  fontFamily: "'cursive', 'Comic Sans MS', 'Marker Felt', 'Bradley Hand', sans-serif"
                                 }}>
                                   What's Included:
                                 </p>
@@ -232,30 +234,32 @@ function ProgramsSection() {
                                 return (
                                   <div 
                                     key={i} 
-                                    className="flex items-center gap-2 py-0.5 md:py-1"
+                                    className="flex items-center gap-2 py-1"
                                     style={{ 
                                       animationDelay: `${i * 0.1}s`
                                     }}
                                   >
                                     {/* Checkmark Circle */}
-                                    <div className="flex-shrink-0 w-5 h-5 md:w-5 md:h-5 rounded-full flex items-center justify-center shadow-lg checkmark-circle" style={{
+                                    <div className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center shadow-lg checkmark-circle" style={{
                                       boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
                                       animationDelay: `${i * 0.15}s`,
                                       background: checkColor
                                     }}>
-                                      <span className="text-white text-xs md:text-xs font-bold">✓</span>
+                                      <span className="text-white text-xs font-bold">✓</span>
                                     </div>
-                                    <span className="text-slate-700 text-sm md:text-sm font-semibold handwritten">{benefit}</span>
+                                    <span className="text-slate-700 text-sm font-semibold handwritten" style={{
+                                      fontFamily: "'cursive', 'Comic Sans MS', 'Marker Felt', 'Bradley Hand', sans-serif"
+                                    }}>{benefit}</span>
                                   </div>
                                 )
                               })}
                             </div>
                             
                             {/* Bottom Section - Tap to Close */}
-                            <div className="mt-auto pt-1 md:pt-2">
-                              <div className="flex items-center justify-center gap-2 text-xs md:text-xs font-semibold text-slate-600">
+                            <div className="mt-auto pt-2">
+                              <div className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-600">
                                 <span>Tap to close</span>
-                                <span className="text-base md:text-base">▲</span>
+                                <span className="text-base">▲</span>
                               </div>
                             </div>
                           </div>
