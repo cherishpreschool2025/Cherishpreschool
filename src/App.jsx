@@ -9,6 +9,7 @@ import FooterDecoration from './components/FooterDecoration'
 import AdminLogin from './components/AdminLogin'
 import AdminDashboard from './components/AdminDashboard'
 import { fetchActivitiesFromSupabase } from './utils/activities'
+import { supabase } from './lib/supabase'
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(false)
@@ -90,11 +91,36 @@ function App() {
       setActivities(mergedActivities)
     }
 
+    // Load activities immediately on mount
     loadActivities()
+
+    // Set up real-time subscription to listen for changes in Supabase
+    // This automatically refreshes when admin adds/updates/deletes activities
+    const channel = supabase
+      .channel('activities-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'activities'
+        },
+        (payload) => {
+          console.log('Activity changed in Supabase:', payload.eventType)
+          // Reload activities when any change is detected
+          loadActivities()
+        }
+      )
+      .subscribe()
 
     // Check if admin is logged in
     const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true'
     setIsAdmin(adminLoggedIn)
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   // Activities are now only stored in Supabase, no localStorage needed

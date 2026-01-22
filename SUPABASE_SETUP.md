@@ -74,12 +74,21 @@ USING (true);
 2. You should see the `activities` table listed
 3. The table should be empty initially
 
-## Step 5: Test It
+## Step 5: Realtime is Already Enabled! ✅
+
+**Good news:** Supabase Realtime subscriptions are enabled by default for all tables. You don't need to configure anything!
+
+The real-time updates will work automatically once the `activities` table is created. When an admin adds/updates/deletes an activity, all users will see the changes instantly without refreshing.
+
+**Note:** The "Replication" page in Supabase Dashboard is for external data replication (like BigQuery), not for Realtime subscriptions. Our app uses Realtime subscriptions which work automatically.
+
+## Step 6: Test It
 
 1. Refresh your website
 2. The 404 errors should be gone
 3. Go to admin dashboard and add/edit an activity
 4. Check the Supabase Table Editor - you should see the activity appear!
+5. Open the website in another browser/incognito window - changes should appear instantly without refresh!
 
 ## Troubleshooting
 
