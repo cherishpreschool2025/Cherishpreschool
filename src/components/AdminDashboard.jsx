@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { uploadMultipleImagesToSupabase, deleteImageFromSupabase } from '../utils/imageUpload'
+import { saveActivitiesToSupabase, deleteActivityFromSupabase } from '../utils/activities'
 
 function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
   const [showAppointments, setShowAppointments] = useState(false)
@@ -135,7 +136,7 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
       images: newImages
     })
     
-    // If editing an existing activity, update it immediately in localStorage
+    // If editing an existing activity, update it immediately in localStorage and Supabase
     if (editingId) {
       const existingActivity = activities.find(a => a.id === editingId)
       if (existingActivity) {
@@ -146,10 +147,14 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
         const updatedActivities = activities.map(activity =>
           activity.id === editingId ? updatedActivity : activity
         )
-        // Update parent state which will save to localStorage
-        onUpdateActivities(updatedActivities)
-        // Also directly update localStorage to ensure it's saved immediately
-        localStorage.setItem('cherishActivities', JSON.stringify(updatedActivities))
+        // Save to Supabase first
+        try {
+          await saveActivitiesToSupabase(updatedActivities)
+          // Only update state after successful Supabase save
+          onUpdateActivities(updatedActivities)
+        } catch (error) {
+          console.error('Error saving to Supabase after image removal:', error)
+        }
       }
     }
   }
@@ -190,10 +195,17 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
       updatedActivities = [...activities, newActivity]
     }
 
-    onUpdateActivities(updatedActivities)
-    
-    // Also directly update localStorage to ensure it's saved
-    localStorage.setItem('cherishActivities', JSON.stringify(updatedActivities))
+    // Save to Supabase first (this is the source of truth)
+    try {
+      await saveActivitiesToSupabase(updatedActivities)
+      console.log('Activities saved to Supabase successfully')
+      // Only update local state after successful Supabase save
+      onUpdateActivities(updatedActivities)
+    } catch (error) {
+      console.error('Error saving activities to Supabase:', error)
+      alert('Error saving activities. Please try again.')
+      // Don't update state if Supabase save fails
+    }
     
     // Reset form and close modal
     setFormData({
@@ -239,11 +251,29 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
         }
       }
       
+      // Delete activity from Supabase database
+      try {
+        await deleteActivityFromSupabase(id)
+        console.log('Activity deleted from Supabase successfully')
+      } catch (error) {
+        console.error('Error deleting activity from Supabase:', error)
+        // Continue even if Supabase delete fails
+      }
+      
       // Remove activity from list
       const updatedActivities = activities.filter(activity => activity.id !== id)
-      onUpdateActivities(updatedActivities)
-      // Also directly update localStorage to ensure it's saved immediately
-      localStorage.setItem('cherishActivities', JSON.stringify(updatedActivities))
+      
+      // Save updated activities list to Supabase first
+      try {
+        await saveActivitiesToSupabase(updatedActivities)
+        console.log('Updated activities saved to Supabase successfully')
+        // Only update state after successful Supabase save
+        onUpdateActivities(updatedActivities)
+      } catch (error) {
+        console.error('Error saving updated activities to Supabase:', error)
+        alert('Error deleting activity. Please try again.')
+        // Don't update state if Supabase save fails
+      }
     }
   }
 

@@ -8,6 +8,7 @@ import FloatingEnquiryButton from './components/FloatingEnquiryButton'
 import FooterDecoration from './components/FooterDecoration'
 import AdminLogin from './components/AdminLogin'
 import AdminDashboard from './components/AdminDashboard'
+import { fetchActivitiesFromSupabase } from './utils/activities'
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(false)
@@ -45,43 +46,58 @@ function App() {
     }
   ]
 
-  // Load activities from localStorage on mount
+  // Load activities: Always show defaults, merge with Supabase data if available
   useEffect(() => {
-    const savedActivities = localStorage.getItem('cherishActivities')
-    if (savedActivities) {
-      const parsed = JSON.parse(savedActivities)
-      // Filter out removed activities if they exist
-      let filtered = parsed.filter(activity => 
-        activity.title !== 'Nature Walk' && 
-        activity.title !== 'Science Fun' && 
-        activity.title !== 'Music & Dance'
-      )
+    const loadActivities = async () => {
+      // Start with default activities
+      let mergedActivities = [...defaultActivities]
       
-      // Clean up activities: remove empty/invalid image URLs
-      filtered = filtered.map(activity => ({
-        ...activity,
-        images: (activity.images || []).filter(img => img && img.trim() !== '')
-      }))
+      try {
+        const supabaseActivities = await fetchActivitiesFromSupabase()
+        
+        if (supabaseActivities && supabaseActivities.length > 0) {
+          // Clean up Supabase activities: remove empty/invalid image URLs
+          const cleanedSupabase = supabaseActivities.map(activity => ({
+            ...activity,
+            images: (activity.images || []).filter(img => img && img.trim() !== '')
+          }))
+          
+          // Merge Supabase activities with defaults
+          // If a Supabase activity has the same ID as a default, update the default with Supabase data
+          // Otherwise, add the Supabase activity
+          cleanedSupabase.forEach(supabaseActivity => {
+            const defaultIndex = mergedActivities.findIndex(a => a.id === supabaseActivity.id)
+            if (defaultIndex !== -1) {
+              // Update existing default activity with Supabase data (including images)
+              mergedActivities[defaultIndex] = {
+                ...mergedActivities[defaultIndex],
+                ...supabaseActivity,
+                // Keep default title/description if Supabase doesn't have them
+                title: supabaseActivity.title || mergedActivities[defaultIndex].title,
+                description: supabaseActivity.description || mergedActivities[defaultIndex].description
+              }
+            } else {
+              // Add new activity from Supabase
+              mergedActivities.push(supabaseActivity)
+            }
+          })
+        }
+      } catch (error) {
+        console.error('Error loading activities from Supabase:', error)
+        // Continue with defaults even if Supabase fails
+      }
       
-      setActivities(filtered)
-      // Update localStorage with cleaned activities
-      localStorage.setItem('cherishActivities', JSON.stringify(filtered))
-    } else {
-      setActivities(defaultActivities)
-      localStorage.setItem('cherishActivities', JSON.stringify(defaultActivities))
+      setActivities(mergedActivities)
     }
+
+    loadActivities()
 
     // Check if admin is logged in
     const adminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true'
     setIsAdmin(adminLoggedIn)
   }, [])
 
-  // Save activities to localStorage whenever they change
-  useEffect(() => {
-    if (activities.length > 0) {
-      localStorage.setItem('cherishActivities', JSON.stringify(activities))
-    }
-  }, [activities])
+  // Activities are now only stored in Supabase, no localStorage needed
 
   // Keyboard shortcut for admin access (Ctrl+Shift+A)
   useEffect(() => {
