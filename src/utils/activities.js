@@ -14,12 +14,21 @@ export async function fetchActivitiesFromSupabase() {
       .order('id', { ascending: true })
 
     if (error) {
+      // If table doesn't exist (404), silently return empty array
+      if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+        console.log('Activities table not found - will be created when you add your first activity')
+        return []
+      }
       console.error('Error fetching activities from Supabase:', error)
-      throw error
+      return []
     }
 
     return data || []
   } catch (error) {
+    // Silently handle table not found errors
+    if (error.message?.includes('404') || error.message?.includes('does not exist')) {
+      return []
+    }
     console.error('Error fetching activities:', error)
     return []
   }
@@ -90,9 +99,19 @@ export async function saveActivityToSupabase(activity) {
 export async function saveActivitiesToSupabase(activities) {
   try {
     // Get all existing activity IDs
-    const { data: existing } = await supabase
+    const { data: existing, error: fetchError } = await supabase
       .from(ACTIVITIES_TABLE)
       .select('id')
+
+    // If table doesn't exist, show helpful message
+    if (fetchError) {
+      if (fetchError.code === 'PGRST116' || fetchError.message?.includes('does not exist')) {
+        console.error('❌ Activities table not found! Please create it in Supabase first.')
+        console.error('📖 See SUPABASE_SETUP.md for instructions')
+        throw new Error('Activities table does not exist. Please create it in Supabase SQL Editor (see SUPABASE_SETUP.md)')
+      }
+      throw fetchError
+    }
 
     const existingIds = (existing || []).map(a => a.id)
     const newIds = activities.map(a => a.id)
