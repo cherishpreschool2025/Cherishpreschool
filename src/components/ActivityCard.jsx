@@ -16,9 +16,7 @@ function ActivityCard({ activity }) {
   
   // Priority: 1. Cover image from public folder, 2. Uploaded images, 3. Emoji
   const coverImage = getCoverImage(activity.title)
-  const hasUploadedImage = activity.images && activity.images.length > 0
-    ? activity.images[0]
-    : (activity.imageFile && activity.imageFile.startsWith('data:image') ? activity.imageFile : null)
+  const hasUploadedImage = activity.images && activity.images.length > 0 ? activity.images[0] : null
   
   const displayImage = coverImage || hasUploadedImage
 
@@ -37,6 +35,17 @@ function ActivityCard({ activity }) {
                 src={displayImage} 
                 alt={activity.title}
                 className="w-full h-48 object-cover hover:scale-110 transition-transform duration-300"
+                onError={(e) => {
+                  // If image fails to load, show emoji fallback
+                  e.target.style.display = 'none'
+                  const parent = e.target.parentElement
+                  if (parent && !parent.querySelector('.fallback-emoji')) {
+                    const fallback = document.createElement('div')
+                    fallback.className = 'fallback-emoji text-6xl text-center py-8'
+                    fallback.textContent = activity.image || '📷'
+                    parent.appendChild(fallback)
+                  }
+                }}
               />
               {hasUploadedImage && activity.images && activity.images.length > 1 && (
                 <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-semibold">

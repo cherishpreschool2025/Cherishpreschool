@@ -3,8 +3,8 @@ import React from 'react'
 function ActivityDetailModal({ activity, onClose }) {
   if (!activity) return null
 
-  // Get all images for this activity - support both new format (images array) and old format (imageFile)
-  const images = activity.images || (activity.imageFile ? [activity.imageFile] : [])
+  // Get all images for this activity
+  const images = activity.images || []
   const hasImages = images.length > 0
 
   return (
@@ -47,12 +47,26 @@ function ActivityDetailModal({ activity, onClose }) {
                 {images.map((image, index) => (
                   <div
                     key={index}
-                    className="group relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                    className="group relative rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 bg-gray-100"
                   >
                     <img
                       src={image}
                       alt={`${activity.title} - Photo ${index + 1}`}
                       className="w-full h-64 object-cover"
+                      onError={(e) => {
+                        // Show error message if image fails to load
+                        e.target.style.display = 'none'
+                        const parent = e.target.parentElement
+                        if (parent && !parent.querySelector('.image-error')) {
+                          const errorDiv = document.createElement('div')
+                          errorDiv.className = 'image-error w-full h-64 flex flex-col items-center justify-center text-gray-400 p-4'
+                          errorDiv.innerHTML = `
+                            <div class="text-4xl mb-2">⚠️</div>
+                            <div class="text-sm text-center">Image not found<br/>Please check the image URL</div>
+                          `
+                          parent.appendChild(errorDiv)
+                        }
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div className="absolute bottom-4 left-4 text-white font-semibold">

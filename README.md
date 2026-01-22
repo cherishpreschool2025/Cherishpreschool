@@ -1,121 +1,88 @@
-# Cherish Pre School Dashboard
+# Cherish Pre School Website
 
-A beautiful, colorful dashboard and catalogue for Cherish Pre School to showcase school work and activities.
+A beautiful website for Cherish Pre School to showcase school activities and student work.
 
 ## Features
 
-- 🎨 **Colorful & Attractive UI** - Modern, child-friendly design with vibrant colors
-- 📚 **Activity Showcase** - Display various school activities with beautiful cards
-- 🖼️ **Work Gallery** - Grid layout to showcase student work
-- 📊 **Statistics Section** - Key metrics and achievements
-- 🎯 **Category Filtering** - Filter activities by category
-- 📱 **Responsive Design** - Works on all devices
-- 🔐 **Admin Login** - Secure admin access to manage activities
-- 📸 **Image Upload** - Upload and display photos of student activities
-- ✏️ **Activity Management** - Add, edit, and delete activities with photos
-- 💾 **Data Persistence** - Activities saved in browser localStorage
+- 🎨 Colorful and child-friendly design
+- 📚 Activity showcase with photos
+- 📸 Photo gallery for each activity
+- 🔐 Admin dashboard to manage activities
+- 📱 Works on all devices (mobile, tablet, desktop)
 
 ## Getting Started
-
-### Prerequisites
-
-- Node.js (v16 or higher)
-- npm or yarn
 
 ### Installation
 
 1. Install dependencies:
-
 ```bash
 npm install
 ```
 
-2. Start the development server:
+2. Set up Supabase (for photo storage):
+   - Create a free account at [supabase.com](https://supabase.com)
+   - Create a storage bucket named `activity-photos`
+   - Make it public
+   - Add storage policies (INSERT, SELECT, UPDATE, DELETE)
+   - Copy your project URL and anon key
 
+3. Create `.env` file:
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+VITE_ADMIN_USERNAME=admin
+VITE_ADMIN_PASSWORD=your_secure_password_here
+```
+
+**Important:** 
+- Never commit the `.env` file to git (it's already in `.gitignore`)
+- Change the default password to something secure
+- Keep your `.env` file private
+
+4. Start the development server:
 ```bash
 npm run dev
 ```
 
-3. Open your browser and navigate to `http://localhost:5173`
+5. Open your browser and go to `http://localhost:5173`
 
-### Build for Production
+## Admin Access
+
+- Click the "Admin" button in the footer and login
+
+**Important:** 
+- Change the admin password in your `.env` file before deploying
+- Use a strong, secure password
+- Never share your `.env` file
+
+## Building for Production
 
 ```bash
 npm run build
 ```
 
-The built files will be in the `dist` directory.
+This creates a `dist` folder with all files ready to deploy.
 
-## Project Structure
+## Deployment - Vercel
 
-```
-cherish-pre-school/
-├── src/
-│   ├── components/
-│   │   ├── ActivityCard.jsx    # Individual activity card component
-│   │   ├── WorkGallery.jsx     # School work gallery component
-│   │   ├── Header.jsx          # Header component
-│   │   └── StatsSection.jsx    # Statistics section component
-│   ├── App.jsx                 # Main app component
-│   ├── main.jsx               # Entry point
-│   └── index.css              # Global styles
-├── index.html
-├── package.json
-├── vite.config.js
-└── tailwind.config.js
-```
+1. **Push code to GitHub** (if not already)
+2. **Go to [vercel.com](https://vercel.com)** and sign up/login
+3. **Import your GitHub repository**
+4. **Add Environment Variables** in Vercel dashboard:
+   - Go to: Settings → Environment Variables
+   - Add all 4 variables:
+     - `VITE_SUPABASE_URL`
+     - `VITE_SUPABASE_ANON_KEY`
+     - `VITE_ADMIN_USERNAME`
+     - `VITE_ADMIN_PASSWORD`
+5. **Deploy** - Vercel will automatically deploy!
 
-## Admin Access
+**Important:** Always add environment variables in your hosting platform's settings!
 
-To access the admin dashboard:
+## Support
 
-1. Click the **"Admin"** button in the header (top right)
-2. Login with the default credentials:
-   - **Username:** `admin`
-   - **Password:** `cherish2025`
+For questions or issues, contact the school administration.
 
-### Admin Features
+---
 
-- **Upload Photos** - Add photos of student activities (up to 5MB per image)
-- **Add Activities** - Create new activity entries with title, description, category, and date
-- **Edit Activities** - Modify existing activities and update photos
-- **Delete Activities** - Remove activities from the dashboard
-- **View All Activities** - See all activities in a management interface
-
-> **Note:** For production use, change the default admin credentials in `src/components/AdminLogin.jsx`
-
-## Customization
-
-### Colors
-
-You can customize the color scheme in `tailwind.config.js`. The current colors are:
-
-- Cherish Blue
-- Cherish Pink
-- Cherish Yellow
-- Cherish Green
-- Cherish Purple
-- Cherish Orange
-
-### Activities
-
-Activities are now managed through the admin dashboard. You can also edit the `defaultActivities` array in `src/App.jsx` for initial setup.
-
-### School Work
-
-Edit the `schoolWork` array in `src/App.jsx` to add or modify school work items.
-
-### Admin Credentials
-
-To change the admin login credentials, edit the `ADMIN_USERNAME` and `ADMIN_PASSWORD` constants in `src/components/AdminLogin.jsx`.
-
-## Technologies Used
-
-- React 18
-- Vite
-- Tailwind CSS
-- Modern CSS Gradients
-
-## License
-
-© 2025 Cherish Pre School
+Made with ❤️ for Cherish Pre School

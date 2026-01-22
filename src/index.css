@@ -14,7 +14,7 @@
   }
   
   .gradient-text {
-    @apply bg-gradient-to-r from-cherish-pink via-cherish-purple to-cherish-blue bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-purple-600 via-purple-500 to-blue-600 bg-clip-text text-transparent;
   }
 }
 
