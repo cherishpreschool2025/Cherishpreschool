@@ -146,7 +146,10 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
         const updatedActivities = activities.map(activity =>
           activity.id === editingId ? updatedActivity : activity
         )
+        // Update parent state which will save to localStorage
         onUpdateActivities(updatedActivities)
+        // Also directly update localStorage to ensure it's saved immediately
+        localStorage.setItem('cherishActivities', JSON.stringify(updatedActivities))
       }
     }
   }
@@ -155,7 +158,8 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
     e.preventDefault()
     
     // Use current form images (already updated when images are removed)
-    let finalImages = formData.images
+    // Filter out any empty/invalid image URLs
+    let finalImages = formData.images.filter(img => img && img.trim() !== '')
 
     // If we have temp activity IDs in image paths, update them with the real activity ID
     const activityId = editingId || Date.now()
@@ -187,6 +191,9 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
     }
 
     onUpdateActivities(updatedActivities)
+    
+    // Also directly update localStorage to ensure it's saved
+    localStorage.setItem('cherishActivities', JSON.stringify(updatedActivities))
     
     // Reset form and close modal
     setFormData({
@@ -235,6 +242,8 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
       // Remove activity from list
       const updatedActivities = activities.filter(activity => activity.id !== id)
       onUpdateActivities(updatedActivities)
+      // Also directly update localStorage to ensure it's saved immediately
+      localStorage.setItem('cherishActivities', JSON.stringify(updatedActivities))
     }
   }
 

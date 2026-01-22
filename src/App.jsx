@@ -51,16 +51,21 @@ function App() {
     if (savedActivities) {
       const parsed = JSON.parse(savedActivities)
       // Filter out removed activities if they exist
-      const filtered = parsed.filter(activity => 
+      let filtered = parsed.filter(activity => 
         activity.title !== 'Nature Walk' && 
         activity.title !== 'Science Fun' && 
         activity.title !== 'Music & Dance'
       )
+      
+      // Clean up activities: remove empty/invalid image URLs
+      filtered = filtered.map(activity => ({
+        ...activity,
+        images: (activity.images || []).filter(img => img && img.trim() !== '')
+      }))
+      
       setActivities(filtered)
-      // Update localStorage with filtered activities
-      if (filtered.length !== parsed.length) {
-        localStorage.setItem('cherishActivities', JSON.stringify(filtered))
-      }
+      // Update localStorage with cleaned activities
+      localStorage.setItem('cherishActivities', JSON.stringify(filtered))
     } else {
       setActivities(defaultActivities)
       localStorage.setItem('cherishActivities', JSON.stringify(defaultActivities))

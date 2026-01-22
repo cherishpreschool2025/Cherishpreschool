@@ -16,7 +16,9 @@ function ActivityCard({ activity }) {
   
   // Priority: 1. Cover image from public folder, 2. Uploaded images, 3. Emoji
   const coverImage = getCoverImage(activity.title)
-  const hasUploadedImage = activity.images && activity.images.length > 0 ? activity.images[0] : null
+  // Filter out empty/invalid image URLs
+  const validImages = (activity.images || []).filter(img => img && img.trim() !== '')
+  const hasUploadedImage = validImages.length > 0 ? validImages[0] : null
   
   const displayImage = coverImage || hasUploadedImage
 
@@ -47,9 +49,9 @@ function ActivityCard({ activity }) {
                   }
                 }}
               />
-              {hasUploadedImage && activity.images && activity.images.length > 1 && (
+              {hasUploadedImage && validImages.length > 1 && (
                 <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-semibold">
-                  +{activity.images.length} photos
+                  +{validImages.length} photos
                 </div>
               )}
             </div>
