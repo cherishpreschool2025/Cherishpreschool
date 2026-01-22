@@ -134,20 +134,28 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
       ...formData,
       images: newImages
     })
+    
+    // If editing an existing activity, update it immediately in localStorage
+    if (editingId) {
+      const existingActivity = activities.find(a => a.id === editingId)
+      if (existingActivity) {
+        const updatedActivity = {
+          ...existingActivity,
+          images: newImages
+        }
+        const updatedActivities = activities.map(activity =>
+          activity.id === editingId ? updatedActivity : activity
+        )
+        onUpdateActivities(updatedActivities)
+      }
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    // Get existing images if editing, merge with new ones
+    // Use current form images (already updated when images are removed)
     let finalImages = formData.images
-    if (editingId) {
-      const existingActivity = activities.find(a => a.id === editingId)
-      if (existingActivity && existingActivity.images) {
-        // Merge existing images with new ones (or replace if new ones added)
-        finalImages = formData.images.length > 0 ? formData.images : existingActivity.images
-      }
-    }
 
     // If we have temp activity IDs in image paths, update them with the real activity ID
     const activityId = editingId || Date.now()
