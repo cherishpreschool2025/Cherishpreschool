@@ -2,6 +2,30 @@ import { supabase } from '../lib/supabase'
 
 const ACTIVITIES_TABLE = 'activities'
 
+function isMissingCoverColumnError(error) {
+  const code = error?.code
+  const text = [error?.message, error?.details, error?.hint].filter(Boolean).join(' ').toLowerCase()
+  return (
+    (code === '42703' || code === 'PGRST204' || code === 'PGRST205') &&
+    text.includes('cover_image_url')
+  )
+}
+
+function activityToDb(activity, { includeCover } = { includeCover: true }) {
+  const payload = {
+    id: activity.id,
+    title: activity.title,
+    description: activity.description,
+    category: activity.category,
+    image: activity.image,
+    color: activity.color,
+    images: activity.images || [],
+  }
+
+  if (includeCover) payload.cover_image_url = activity.cover_image_url || null
+  return payload
+}
+
 /**
  * Fetches all activities from Supabase database
  * @returns {Promise<Array>} Array of activities
@@ -50,37 +74,39 @@ export async function saveActivityToSupabase(activity) {
 
     if (existing) {
       // Update existing activity
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from(ACTIVITIES_TABLE)
-        .update({
-          title: activity.title,
-          description: activity.description,
-          category: activity.category,
-          image: activity.image,
-          color: activity.color,
-          images: activity.images || []
-        })
+        .update(activityToDb(activity, { includeCover: true }))
         .eq('id', activity.id)
         .select()
         .single()
+
+      if (error && isMissingCoverColumnError(error)) {
+        ;({ data, error } = await supabase
+          .from(ACTIVITIES_TABLE)
+          .update(activityToDb(activity, { includeCover: false }))
+          .eq('id', activity.id)
+          .select()
+          .single())
+      }
 
       if (error) throw error
       return data
     } else {
       // Insert new activity
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from(ACTIVITIES_TABLE)
-        .insert({
-          id: activity.id,
-          title: activity.title,
-          description: activity.description,
-          category: activity.category,
-          image: activity.image,
-          color: activity.color,
-          images: activity.images || []
-        })
+        .insert(activityToDb(activity, { includeCover: true }))
         .select()
         .single()
+
+      if (error && isMissingCoverColumnError(error)) {
+        ;({ data, error } = await supabase
+          .from(ACTIVITIES_TABLE)
+          .insert(activityToDb(activity, { includeCover: false }))
+          .select()
+          .single())
+      }
 
       if (error) throw error
       return data
@@ -131,20 +157,21 @@ export async function saveActivitiesToSupabase(activities) {
 
     // Upsert all activities (insert or update)
     if (activities.length > 0) {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from(ACTIVITIES_TABLE)
-        .upsert(activities.map(activity => ({
-          id: activity.id,
-          title: activity.title,
-          description: activity.description,
-          category: activity.category,
-          image: activity.image,
-          color: activity.color,
-          images: activity.images || []
-        })), {
+        .upsert(activities.map((activity) => activityToDb(activity, { includeCover: true })), {
           onConflict: 'id'
         })
         .select()
+
+      if (error && isMissingCoverColumnError(error)) {
+        ;({ data, error } = await supabase
+          .from(ACTIVITIES_TABLE)
+          .upsert(activities.map((activity) => activityToDb(activity, { includeCover: false })), {
+            onConflict: 'id',
+          })
+          .select())
+      }
 
       if (error) throw error
       return data || activities

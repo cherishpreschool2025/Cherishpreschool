@@ -30,6 +30,9 @@ CREATE TABLE IF NOT EXISTS public.health_checks (
 CREATE INDEX IF NOT EXISTS idx_health_checks_checked_at
   ON public.health_checks (checked_at DESC);
 
+-- Ensure the API roles can read the table (RLS is still enforced separately).
+GRANT SELECT ON TABLE public.health_checks TO anon, authenticated;
+
 ALTER TABLE public.health_checks ENABLE ROW LEVEL SECURITY;
 
 -- Allow the Admin UI (uses anon key) to read checks.
@@ -38,6 +41,9 @@ ON public.health_checks
 FOR SELECT
 TO public
 USING (true);
+
+-- If you still see `PGRST205` / schema cache 404s after creating the table, force a schema reload:
+NOTIFY pgrst, 'reload schema';
 ```
 
 ## Step 3: Choose how inserts work (pick ONE)

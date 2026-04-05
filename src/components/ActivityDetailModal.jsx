@@ -3,8 +3,11 @@ import React from 'react'
 function ActivityDetailModal({ activity, onClose }) {
   if (!activity) return null
 
-  // Get all images for this activity, filter out any invalid/broken URLs
-  const images = (activity.images || []).filter(img => img && img.trim() !== '')
+  // Get all images for this activity, filter out any invalid/broken URLs.
+  // Include the cover image (if set) as the first gallery image.
+  const cover = activity.cover_image_url ? String(activity.cover_image_url).trim() : ''
+  const gallery = (activity.images || []).filter(img => img && img.trim() !== '')
+  const images = cover ? [cover, ...gallery.filter((img) => img !== cover)] : gallery
   const hasImages = images.length > 0
 
   return (

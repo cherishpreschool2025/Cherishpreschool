@@ -14,13 +14,14 @@ function ActivityCard({ activity }) {
     return coverImageMap[title] || null
   }
   
-  // Priority: 1. Cover image from public folder, 2. Uploaded images, 3. Emoji
+  // Priority: 1. Uploaded cover image (admin), 2. Cover image from public folder, 3. Uploaded images, 4. Emoji
+  const uploadedCoverImage = activity.cover_image_url || null
   const coverImage = getCoverImage(activity.title)
   // Filter out empty/invalid image URLs
   const validImages = (activity.images || []).filter(img => img && img.trim() !== '')
   const hasUploadedImage = validImages.length > 0 ? validImages[0] : null
   
-  const displayImage = coverImage || hasUploadedImage
+  const displayImage = uploadedCoverImage || coverImage || hasUploadedImage
 
   return (
     <>

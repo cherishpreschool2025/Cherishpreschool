@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS activities (
   category TEXT NOT NULL,
   image TEXT,
   color TEXT,
+  cover_image_url TEXT,
   images JSONB DEFAULT '[]'::jsonb,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -61,6 +62,10 @@ ON activities
 FOR DELETE
 TO public
 USING (true);
+
+-- If you created the table earlier, run this once to add cover support:
+-- ALTER TABLE activities ADD COLUMN IF NOT EXISTS cover_image_url TEXT;
+-- NOTIFY pgrst, 'reload schema';
 ```
 
 ## Step 3: Run the SQL
