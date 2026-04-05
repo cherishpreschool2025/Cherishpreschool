@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { uploadMultipleImagesToSupabase, deleteImageFromSupabase } from '../utils/imageUpload'
 import { saveActivitiesToSupabase, deleteActivityFromSupabase } from '../utils/activities'
+import { fetchHealthChecksFromSupabase } from '../utils/healthChecks'
 
 function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
+  const [activeTab, setActiveTab] = useState('activities')
   const [showAppointments, setShowAppointments] = useState(false)
   const [appointments, setAppointments] = useState([])
+  const [healthChecks, setHealthChecks] = useState([])
+  const [healthLoading, setHealthLoading] = useState(false)
+  const [healthTableMissing, setHealthTableMissing] = useState(false)
+  const [healthError, setHealthError] = useState('')
 
   // Load appointments from localStorage
   useEffect(() => {
@@ -28,6 +34,53 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
       clearInterval(interval)
     }
   }, [])
+
+  const loadHealthChecks = async () => {
+    setHealthLoading(true)
+    setHealthError('')
+    try {
+      const { checks, tableMissing, error } = await fetchHealthChecksFromSupabase({ limit: 30 })
+      setHealthChecks(checks)
+      setHealthTableMissing(tableMissing)
+      if (error && !tableMissing) {
+        setHealthError(error.message || 'Failed to load health checks')
+      }
+    } catch (error) {
+      setHealthError(error?.message || 'Failed to load health checks')
+    } finally {
+      setHealthLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab !== 'health') return
+
+    let cancelled = false
+
+    const run = async () => {
+      setHealthLoading(true)
+      setHealthError('')
+      try {
+        const { checks, tableMissing, error } = await fetchHealthChecksFromSupabase({ limit: 30 })
+        if (cancelled) return
+        setHealthChecks(checks)
+        setHealthTableMissing(tableMissing)
+        setHealthError(error && !tableMissing ? error.message || 'Failed to load health checks' : '')
+      } catch (error) {
+        if (cancelled) return
+        setHealthError(error?.message || 'Failed to load health checks')
+      } finally {
+        if (!cancelled) setHealthLoading(false)
+      }
+    }
+
+    run()
+    const interval = setInterval(run, 30_000)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [activeTab])
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -299,6 +352,8 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
     setShowFormModal(true)
   }
 
+  const latestHealthCheck = healthChecks?.[0] || null
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-pink-50 to-yellow-50 py-4 sm:py-6 md:py-8">
       <div className="container mx-auto px-3 sm:px-4 md:px-6">
@@ -320,98 +375,264 @@ function AdminDashboard({ onLogout, activities, onUpdateActivities }) {
           </div>
         </div>
 
-        {/* Activities List - Full Width */}
-        <div>
-          {/* Activities List */}
-          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 mb-4 sm:mb-6">
-            <div className="flex justify-between items-center mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold gradient-text">Manage Activities ({activities.length})</h2>
-              <button
-                onClick={handleNewActivity}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white w-10 h-10 sm:w-12 sm:h-12 rounded-full text-2xl sm:text-3xl font-bold hover:shadow-lg transition-all flex items-center justify-center"
-                title="Add New Activity"
-              >
-                +
-              </button>
-            </div>
-            
-            <div className="space-y-3 sm:space-y-4">
-              {activities.map(activity => (
-                <div
-                  key={activity.id}
-                  className="bg-white rounded-xl shadow-lg p-4 sm:p-6 flex flex-col sm:flex-row gap-3 sm:gap-4"
+        {/* Tabs */}
+        <div className="bg-white rounded-2xl shadow-xl p-2 sm:p-3 mb-4 sm:mb-6">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab('activities')}
+              className={[
+                'px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-semibold transition-all',
+                activeTab === 'activities'
+                  ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+              ].join(' ')}
+            >
+              Activities
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('health')}
+              className={[
+                'px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-semibold transition-all',
+                activeTab === 'health'
+                  ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+              ].join(' ')}
+            >
+              Health
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'activities' && (
+          <div>
+            {/* Activities List */}
+            <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 mb-4 sm:mb-6">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold gradient-text">Manage Activities ({activities.length})</h2>
+                <button
+                  onClick={handleNewActivity}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white w-10 h-10 sm:w-12 sm:h-12 rounded-full text-2xl sm:text-3xl font-bold hover:shadow-lg transition-all flex items-center justify-center"
+                  title="Add New Activity"
                 >
-                  <div className="flex-shrink-0 flex justify-center sm:justify-start">
-                    {(() => {
-                      const images = activity.images || []
-                      const firstImage = images[0]
-                      
-                      if (firstImage) {
-                        return (
-                          <div className="relative">
-                            <img
-                              src={firstImage}
-                              alt={activity.title}
-                              className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl"
-                            />
-                            {images.length > 1 && (
-                              <div className="absolute -top-2 -right-2 bg-cherish-pink text-white text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
-                                +{images.length}
-                              </div>
-                            )}
-                          </div>
-                        )
-                      } else {
-                        return (
-                          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl flex items-center justify-center text-3xl sm:text-4xl">
-                            {activity.image}
-                          </div>
-                        )
-                      }
-                    })()}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1 break-words">{activity.title}</h3>
-                    <p className="text-sm sm:text-base text-gray-600 mb-2 line-clamp-2">{activity.description}</p>
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 mb-3 sm:mb-0">
-                      <span className="bg-gray-100 px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">
-                        {categories.find(c => c.id === activity.category)?.name}
-                      </span>
-                      {activity.images?.length > 0 && (
-                        <span className="bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">
-                          📷 {activity.images.length} photo{activity.images.length > 1 ? 's' : ''}
+                  +
+                </button>
+              </div>
+
+              <div className="space-y-3 sm:space-y-4">
+                {activities.map(activity => (
+                  <div
+                    key={activity.id}
+                    className="bg-white rounded-xl shadow-lg p-4 sm:p-6 flex flex-col sm:flex-row gap-3 sm:gap-4"
+                  >
+                    <div className="flex-shrink-0 flex justify-center sm:justify-start">
+                      {(() => {
+                        const images = activity.images || []
+                        const firstImage = images[0]
+
+                        if (firstImage) {
+                          return (
+                            <div className="relative">
+                              <img
+                                src={firstImage}
+                                alt={activity.title}
+                                className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl"
+                              />
+                              {images.length > 1 && (
+                                <div className="absolute -top-2 -right-2 bg-cherish-pink text-white text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full">
+                                  +{images.length}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        } else {
+                          return (
+                            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl flex items-center justify-center text-3xl sm:text-4xl">
+                              {activity.image}
+                            </div>
+                          )
+                        }
+                      })()}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1 break-words">{activity.title}</h3>
+                      <p className="text-sm sm:text-base text-gray-600 mb-2 line-clamp-2">{activity.description}</p>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 mb-3 sm:mb-0">
+                        <span className="bg-gray-100 px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">
+                          {categories.find(c => c.id === activity.category)?.name}
                         </span>
-                      )}
+                        {activity.images?.length > 0 && (
+                          <span className="bg-blue-100 text-blue-700 px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">
+                            📷 {activity.images.length} photo{activity.images.length > 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 sm:flex-col lg:flex-row">
+                      <button
+                        onClick={() => handleEdit(activity)}
+                        className="bg-blue-500 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-blue-600 transition-colors flex-1 sm:flex-none"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(activity.id)}
+                        className="bg-red-500 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-red-600 transition-colors flex-1 sm:flex-none"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
-                  
-                  <div className="flex gap-2 sm:flex-col lg:flex-row">
-                    <button
-                      onClick={() => handleEdit(activity)}
-                      className="bg-blue-500 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-blue-600 transition-colors flex-1 sm:flex-none"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(activity.id)}
-                      className="bg-red-500 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm hover:bg-red-600 transition-colors flex-1 sm:flex-none"
-                    >
-                      Delete
-                    </button>
+                ))}
+
+                {activities.length === 0 && (
+                  <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+                    <div className="text-6xl mb-4">📝</div>
+                    <p className="text-gray-600 text-lg">No activities yet. Click the + button to add your first activity!</p>
                   </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'health' && (
+          <div className="space-y-4 sm:space-y-6">
+            <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold gradient-text">Supabase Health</h2>
+                  <p className="text-sm sm:text-base text-gray-600">
+                    Vercel cron runs daily at 12:00 AM IST (18:30 UTC)
+                  </p>
                 </div>
-              ))}
-              
-              {activities.length === 0 && (
-                <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                  <div className="text-6xl mb-4">📝</div>
-                  <p className="text-gray-600 text-lg">No activities yet. Click the + button to add your first activity!</p>
+
+                <button
+                  type="button"
+                  onClick={loadHealthChecks}
+                  disabled={healthLoading}
+                  className="bg-gray-900 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm sm:text-base font-semibold hover:bg-black transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {healthLoading ? 'Refreshing…' : 'Refresh'}
+                </button>
+              </div>
+
+              {healthError && (
+                <div className="mt-4 bg-red-100 border-2 border-red-300 text-red-800 px-4 py-3 rounded-xl text-sm sm:text-base">
+                  {healthError}
+                </div>
+              )}
+
+              {healthTableMissing && (
+                <div className="mt-4 bg-yellow-50 border-2 border-yellow-200 text-yellow-900 px-4 py-3 rounded-xl text-sm sm:text-base">
+                  Health checks table not found. Create `health_checks` in Supabase (see `SUPABASE_HEALTH_SETUP.md`).
+                </div>
+              )}
+
+              <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+                <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-4 border border-gray-100">
+                  <p className="text-xs sm:text-sm text-gray-600 font-semibold mb-1">Current Status</p>
+                  {latestHealthCheck ? (
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={[
+                          'inline-flex items-center px-3 py-1 rounded-full text-sm font-bold border',
+                          latestHealthCheck.ok
+                            ? 'bg-green-100 text-green-800 border-green-200'
+                            : 'bg-red-100 text-red-800 border-red-200',
+                        ].join(' ')}
+                      >
+                        {latestHealthCheck.ok ? 'Healthy' : 'Degraded'}
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm">No data yet</p>
+                  )}
+                </div>
+
+                <div className="bg-gradient-to-br from-gray-50 to-pink-50 rounded-2xl p-4 border border-gray-100">
+                  <p className="text-xs sm:text-sm text-gray-600 font-semibold mb-1">Last Check</p>
+                  {latestHealthCheck?.checked_at ? (
+                    <p className="text-gray-900 font-bold">
+                      {new Date(latestHealthCheck.checked_at).toLocaleString()}
+                    </p>
+                  ) : (
+                    <p className="text-gray-500 text-sm">—</p>
+                  )}
+                </div>
+
+                <div className="bg-gradient-to-br from-gray-50 to-yellow-50 rounded-2xl p-4 border border-gray-100">
+                  <p className="text-xs sm:text-sm text-gray-600 font-semibold mb-1">Latency</p>
+                  <p className="text-gray-900 font-bold">
+                    {typeof latestHealthCheck?.latency_ms === 'number' ? `${latestHealthCheck.latency_ms} ms` : '—'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="p-4 sm:p-6 border-b border-gray-100">
+                <h3 className="text-lg sm:text-xl font-bold gradient-text">Recent Checks</h3>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">Latest 30 runs</p>
+              </div>
+
+              {healthChecks.length === 0 ? (
+                <div className="p-6 sm:p-10 text-center">
+                  <div className="text-5xl mb-3">🩺</div>
+                  <p className="text-gray-700 font-semibold">No health checks logged yet.</p>
+                  <p className="text-gray-500 text-sm mt-1">
+                    After you create the table, the next cron run will appear here.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-gray-50 text-gray-600">
+                      <tr>
+                        <th className="text-left px-4 sm:px-6 py-3 font-semibold">Time</th>
+                        <th className="text-left px-4 sm:px-6 py-3 font-semibold">Status</th>
+                        <th className="text-left px-4 sm:px-6 py-3 font-semibold">Latency</th>
+                        <th className="text-left px-4 sm:px-6 py-3 font-semibold">Primary</th>
+                        <th className="text-left px-4 sm:px-6 py-3 font-semibold">Fallback</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {healthChecks.map((row) => (
+                        <tr key={row.id ?? row.checked_at} className="hover:bg-gray-50">
+                          <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-900">
+                            {row.checked_at ? new Date(row.checked_at).toLocaleString() : '—'}
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 whitespace-nowrap">
+                            <span
+                              className={[
+                                'inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border',
+                                row.ok ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200',
+                              ].join(' ')}
+                            >
+                              {row.ok ? 'OK' : 'FAIL'}
+                            </span>
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-900">
+                            {typeof row.latency_ms === 'number' ? `${row.latency_ms} ms` : '—'}
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-700">
+                            {row.primary_status ?? '—'}
+                          </td>
+                          <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-700">
+                            {row.fallback_status ?? '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
           </div>
-        </div>
+        )}
 
         {/* Form Modal */}
         {showFormModal && (

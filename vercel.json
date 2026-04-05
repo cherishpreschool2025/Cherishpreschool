@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/ping",
+      "schedule": "30 18 * * *"
+    }
+  ],
+  "functions": {
+    "api/cron/ping.js": {
+      "maxDuration": 60
+    }
+  }
+}
+
